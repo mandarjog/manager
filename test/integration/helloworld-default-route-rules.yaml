@@ -1,0 +1,8 @@
+destination: "helloworld"
+http:
+  weightedClusters:
+  - dstCluster:
+      name: helloworld
+      tags:
+        - "version=v1"
+    weight: 100

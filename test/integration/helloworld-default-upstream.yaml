@@ -1,0 +1,11 @@
+---
+cluster:
+  name: helloworld
+  tags:
+    - "version=v1"
+---
+cluster:
+  name: helloworld
+  tags:
+    - "version=v2"
+---
