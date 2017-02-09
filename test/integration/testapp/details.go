@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 )
 
 var details = map[string]string{
@@ -30,14 +29,7 @@ var details = map[string]string{
 }
 
 func main() {
-	// if len(os.Args) < 2 {
-	// 	log.Printf("Usage: %s <port>", os.Args[0])
-	// 	os.Exit(-1)
-	// }
-
-	// port := os.Args[1]
-
-	port := 9080
+	port := "9080"
 	http.HandleFunc("/details", detailsHandler)
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

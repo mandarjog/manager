@@ -58,7 +58,7 @@ var reviews = map[string]*review{
 }
 
 func main() {
-	port := 9080
+	port := "9080"
 	enableRatings = os.Getenv(enableRatingsEnvVar) == "true"
 	starColor = os.Getenv(starColorEnvVar)
 	if starColor == "" {

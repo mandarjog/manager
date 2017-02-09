@@ -20,7 +20,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
@@ -45,7 +44,7 @@ type rating struct {
 }
 
 func main() {
-	port := 9080
+	port := "9080"
 	http.HandleFunc("/productpage", productpageHandler)
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -137,7 +136,7 @@ func doRequest(url string, forwardHeaders http.Header, timeout time.Duration, at
 	}
 
 	err := fmt.Errorf("run out of attempts")
-	log.Printf("Error executing HTTP request (%s %s): %v", "GET", proxyURL+path, err)
+	log.Printf("Error executing HTTP request (%s %s): %v", "GET", url, err)
 	return nil, err
 }
 

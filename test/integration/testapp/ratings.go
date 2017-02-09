@@ -18,7 +18,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"os"
 )
 
 type rating struct {
@@ -35,7 +34,7 @@ var ratings = map[string]*rating{
 }
 
 func main() {
-	port := 9080
+	port := "9080"
 
 	http.HandleFunc("/ratings", ratingsHandler)
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
