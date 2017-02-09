@@ -1,13 +1,13 @@
-destination: "helloworld"
+destination: "helloworld.default.svc.cluster.local"
 http:
   weightedClusters:
     - dstCluster:
-        name: helloworld
+        name: helloworld.default.svc.cluster.local
         tags:
           - "version=v1"
       weight: 75
     - dstCluster:
-        name: helloworld
+        name: helloworld.default.svc.cluster.local
         tags:
           - "version=v2"
       weight: 25

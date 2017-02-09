@@ -43,7 +43,7 @@ spec:
         pod.beta.kubernetes.io/init-containers: >
           [{
             "name": "iptables",
-            "image": "docker.io/rshriram/init:test",
+            "image": "docker.io/rshriram/init:ubuntu",
             "imagePullPolicy": "Always",
             "securityContext": { "capabilities" : { "add" : ["NET_ADMIN"] } }
           }]
@@ -58,7 +58,7 @@ spec:
         - name: SERVICE_VERSION
           value: gateway
       - name: proxy
-        image: docker.io/rshriram/runtime:test
+        image: docker.io/rshriram/runtime:ubuntu
         securityContext:
           runAsUser: 1337
         args:
@@ -99,7 +99,7 @@ spec:
         pod.beta.kubernetes.io/init-containers: >
           [{
             "name": "iptables",
-            "image": "docker.io/rshriram/init:test",
+            "image": "docker.io/rshriram/init:ubuntu",
             "imagePullPolicy": "Always",
             "securityContext": { "capabilities" : { "add" : ["NET_ADMIN"] } }
           }]
@@ -114,7 +114,7 @@ spec:
         - name: SERVICE_VERSION
           value: version1
       - name: proxy
-        image: docker.io/rshriram/runtime:test
+        image: docker.io/rshriram/runtime:ubuntu
         securityContext:
           runAsUser: 1337
         args:
@@ -141,7 +141,7 @@ spec:
         pod.beta.kubernetes.io/init-containers: >
           [{
             "name": "iptables",
-            "image": "docker.io/rshriram/init:test",
+            "image": "docker.io/rshriram/init:ubuntu",
             "imagePullPolicy": "Always",
             "securityContext": { "capabilities" : { "add" : ["NET_ADMIN"] } }
           }]
@@ -156,7 +156,7 @@ spec:
         - name: SERVICE_VERSION
           value: version2
       - name: proxy
-        image: docker.io/rshriram/runtime:test
+        image: docker.io/rshriram/runtime:ubuntu
         securityContext:
           runAsUser: 1337
         args:

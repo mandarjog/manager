@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - name: manager
-        image: docker.io/rshriram/runtime:test
+        image: docker.io/rshriram/runtime:ubuntu
         args: ["server", "--logtostderr", "-v", "2"]
         imagePullPolicy: Always
         ports:
