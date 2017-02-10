@@ -30,10 +30,12 @@ import (
 
 var (
 	ports []string
+	version string
 )
 
 func init() {
 	flag.StringArrayVar(&ports, "port", []string{"8080"}, "HTTP/1.1 ports")
+	flag.StringVar(&version, "version", "unversioned", "service version")
 }
 
 func httpHandler(w http.ResponseWriter, r *http.Request) {
@@ -48,6 +50,7 @@ func httpHandler(w http.ResponseWriter, r *http.Request) {
 			body.WriteString(fmt.Sprintf("%v=%v\n", name, h))
 		}
 	}
+	body.WriteString(fmt.Sprintf("ServiceVersion=%v\n",version))
 
 	w.Header().Set("Content-Type", "application/text")
 	w.WriteHeader(http.StatusOK)

@@ -53,6 +53,8 @@ var (
 )
 
 func cleanup() {
+	// sometimes namespace cleanup is not enough in minikube
+	run("kubectl delete -f " + yaml + " -n " + namespace)
 	deleteNamespace(client, namespace)
 }
 
@@ -107,6 +109,8 @@ func main() {
 		"name":  "a",
 		"port1": "8080",
 		"port2": "80",
+		"version1" : "v1",
+		"version2" : "v2",
 	}, w))
 
 	check(write("test/integration/http-service.yaml.tmpl", map[string]string{
@@ -115,6 +119,8 @@ func main() {
 		"name":  "b",
 		"port1": "80",
 		"port2": "8000",
+		"version1" : "v1",
+		"version2" : "v2",
 	}, w))
 
 	check(write("test/integration/external-services.yaml.tmpl", map[string]string{
@@ -130,8 +136,10 @@ func main() {
 	pods := getPods()
 	log.Println("pods:", pods)
 	if dump {
-		dumpProxyLogs(pods["a"])
-		dumpProxyLogs(pods["b"])
+		dumpProxyLogs(pods["a-v1"])
+		dumpProxyLogs(pods["a-v2"])
+		dumpProxyLogs(pods["b-v1"])
+		dumpProxyLogs(pods["b-v2"])
 	}
 	ids := makeRequests(pods)
 	log.Println("requests:", ids)
@@ -223,7 +231,11 @@ func getPods() map[string]string {
 
 	for _, pod := range pods {
 		if app, exists := pod.Labels["app"]; exists {
-			out[app] = pod.Name
+			pname := app
+			if version, exists := pod.Labels["version"]; exists {
+				pname = app + "-" + version
+			}
+			out[pname] = pod.Name
 		}
 	}
 
@@ -249,33 +261,39 @@ func makeRequests(pods map[string]string) map[string][]string {
 		out[app] = make([]string, 0)
 	}
 
-	testPods := []string{"a", "b", "t"}
-	for _, src := range testPods {
-		for _, dst := range testPods {
+	testPodsServices := map[string]string {
+		"a-v1" : "a",
+		"b-v1" : "b",
+		"a-v2" : "a",
+		"b-v2": "b",
+		"t" : "t",
+	}
+	for srcPod, srcSvc := range testPodsServices {
+		for dstPod, dstSvc := range testPodsServices {
 			for _, port := range []string{"", ":80", ":8080"} {
 				for _, domain := range []string{"", "." + namespace} {
 					for n := 0; ; n++ {
-						url := fmt.Sprintf("http://%s%s%s/%s", dst, domain, port, src)
-						log.Printf("Making a request %s from %s (attempt %d)...\n", url, src, n)
+						url := fmt.Sprintf("http://%s%s%s/%s", dstSvc, domain, port, srcSvc)
+						log.Printf("Making a request %s from %s (attempt %d)...\n", url, srcPod, n)
 						request := shell(fmt.Sprintf("kubectl exec %s -n %s -c app client %s",
-							pods[src], namespace, url))
+							pods[srcPod], namespace, url))
 						log.Println(request)
 						match := regexp.MustCompile("X-Request-Id=(.*)").FindStringSubmatch(request)
 						if len(match) > 1 {
 							id := match[1]
 							log.Printf("id=%s\n", id)
-							out[src] = append(out[src], id)
-							out[dst] = append(out[dst], id)
+							out[srcPod] = append(out[srcPod], id)
+							out[dstPod] = append(out[dstPod], id)
 							break
 						}
 
-						if src == "t" && dst == "t" {
+						if srcPod == "t" && dstPod == "t" {
 							log.Println("Expected no match")
 							break
 						}
 
 						if n > budget {
-							fail(fmt.Sprintf("Failed to inject proxy from %s to %s (url %s)", src, dst, url))
+							fail(fmt.Sprintf("Failed to inject proxy from %s to %s (url %s)", srcPod, dstPod, url))
 						}
 
 						time.Sleep(1 * time.Second)
@@ -292,7 +310,7 @@ func makeRequests(pods map[string]string) map[string][]string {
 func checkAccessLogs(pods map[string]string, ids map[string][]string) {
 	for n := 0; ; n++ {
 		found := true
-		for _, pod := range []string{"a", "b"} {
+		for _, pod := range []string{"a-v1", "a-v2", "b-v1", "b-v2"} {
 			log.Printf("Checking access log of %s\n", pod)
 			access := shell(fmt.Sprintf("kubectl logs %s -n %s -c proxy", pods[pod], namespace))
 			for _, id := range ids[pod] {
